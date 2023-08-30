@@ -123,6 +123,9 @@ describe "Markets API" do
         expect(json).to have_key(:errors)
         expect(json[:errors]).to be_an Array
         expect(json[:errors].count).to eq(1)
+        
+        expect(json[:errors][0]).to be_a Hash
+        expect(json[:errors][0]).to have_key(:detail)
         expect(json[:errors][0][:detail]).to eq("Couldn't find Market with 'id'=123123123123")
       end
     end
