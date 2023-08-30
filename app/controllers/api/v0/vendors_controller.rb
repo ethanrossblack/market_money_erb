@@ -8,7 +8,8 @@ class Api::V0::VendorsController < ApplicationController
     if vendor.save
       render json: VendorSerializer.new(vendor), status: :created
     else
-      # FIGURE THIS OUT LATER
+      errors = vendor.errors.full_messages.join(", ")
+      render json: { errors: [ detail: "Validation failed: #{errors}"]}, status: :bad_request
     end
   end
 

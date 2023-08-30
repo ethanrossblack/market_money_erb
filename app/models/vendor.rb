@@ -3,5 +3,5 @@ class Vendor < ApplicationRecord
   has_many :markets, through: :market_vendors
 
   validates :name, :description, :contact_name, :contact_phone, presence: true
-  validates :credit_accepted, inclusion: [true, false]
+  validates_inclusion_of :credit_accepted, in: [true, false], message: "can't be blank"
 end
