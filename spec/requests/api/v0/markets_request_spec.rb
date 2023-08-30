@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "Markets API" do
+describe "Markets API Endpoint" do
   describe "/markets" do
     it "returns a list of all markets" do
       create_list(:market, 5)
