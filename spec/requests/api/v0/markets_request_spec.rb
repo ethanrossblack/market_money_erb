@@ -130,4 +130,75 @@ describe "Markets API" do
       end
     end
   end
+
+  describe "/markets/:market_id/vendors" do
+    describe "happy paths" do
+      it "can return all vendors for a market" do
+        market = create(:market)
+
+        3.times do
+          MarketVendor.create!(market_id: market.id, vendor_id: create(:vendor).id)
+        end
+
+        get "/api/v0/markets/#{market.id}/vendors"
+        expect(response).to be_successful
+
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json).to have_key(:data)
+        
+        vendors = json[:data]
+        expect(vendors).to be_an Array
+        expect(vendors.count).to eq(3)
+
+        vendor = vendors.first
+        expect(vendor).to be_a Hash
+        
+        expect(vendor).to have_key(:id)
+        expect(vendor[:id]).to be_a String
+        
+        expect(vendor).to have_key(:type)
+        expect(vendor[:type]).to be_a String
+        expect(vendor[:type]).to eq("vendor")
+        
+        expect(vendor).to have_key(:attributes)
+        
+        attributes = vendor[:attributes]
+        expect(attributes).to be_a Hash
+        
+        expect(attributes).to have_key(:name)
+        expect(attributes[:name]).to be_a String
+        
+        expect(attributes).to have_key(:description)
+        expect(attributes[:description]).to be_a String
+        
+        expect(attributes).to have_key(:contact_name)
+        expect(attributes[:contact_name]).to be_a String
+        
+        expect(attributes).to have_key(:contact_phone)
+        expect(attributes[:contact_phone]).to be_a String
+        
+        expect(attributes).to have_key(:credit_accepted)
+        expect(attributes[:credit_accepted]).to be_in([true, false])
+      end
+    end
+
+    describe "sad path" do
+      it "returns a 404 error if searching for vendors from an invalid Market id" do
+        get "/api/v0/markets/123123123123/vendors"
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(json).to have_key(:errors)
+        expect(json[:errors]).to be_an Array
+        expect(json[:errors].count).to eq(1)
+        
+        expect(json[:errors][0]).to be_a Hash
+        expect(json[:errors][0]).to have_key(:detail)
+        expect(json[:errors][0][:detail]).to eq("Couldn't find Market with 'id'=123123123123")
+      end
+    end
+  end
 end
