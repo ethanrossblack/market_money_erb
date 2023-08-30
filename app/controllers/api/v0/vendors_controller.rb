@@ -4,7 +4,12 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def create
-    render json: VendorSerializer.new(Vendor.create(vendor_params)), status: :created
+    vendor = Vendor.new(vendor_params)
+    if vendor.save
+      render json: VendorSerializer.new(vendor), status: :created
+    else
+      # FIGURE THIS OUT LATER
+    end
   end
 
   private
