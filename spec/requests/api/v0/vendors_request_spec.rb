@@ -124,7 +124,7 @@ describe "Vendors API Endpoint" do
     end
 
     describe "sad paths" do
-      xit "returns a 400 error if anything is missing" do
+      it "returns a 400 error if anything is missing" do
         vendor_params = {
           "name": "Buzzy Bees",
           "description": "local honey and wax products",
@@ -133,6 +133,19 @@ describe "Vendors API Endpoint" do
         headers = {"CONTENT_TYPE": "application/json"}
         
         post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(json).to have_key(:errors)
+        expect(json[:errors]).to be_an Array
+        expect(json[:errors].count).to eq(1)
+        
+        expect(json[:errors][0]).to be_a Hash
+        expect(json[:errors][0]).to have_key(:detail)
+        expect(json[:errors][0][:detail]).to eq("Validation failed: Contact name can't be blank, Contact phone can't be blank")
       end
     end
   end
