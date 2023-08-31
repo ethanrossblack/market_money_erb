@@ -4,4 +4,9 @@ class Vendor < ApplicationRecord
 
   validates :name, :description, :contact_name, :contact_phone, presence: true
   validates_inclusion_of :credit_accepted, in: [true, false], message: "can't be blank"
+
+
+  # IDEA FOR METHOD
+  # if credit_accepted.nil?
+  # return error message
 end
