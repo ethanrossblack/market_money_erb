@@ -67,6 +67,9 @@ RSpec.configure do |config|
 
   # Config FactoryBot Methods
   config.include FactoryBot::Syntax::Methods
+
+  # Have documentation formatting by default
+  config.formatter = :documentation
 end
 
 Shoulda::Matchers.configure do |config|

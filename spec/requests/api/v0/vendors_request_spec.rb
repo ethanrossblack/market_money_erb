@@ -1,7 +1,7 @@
 require "rails_helper"
 
-describe "Vendors API Endpoint" do
-  describe "get one vendor'" do
+describe "Vendors API Endpoint ('/api/v0/vendors')" do
+  describe "Get One Vendor (GET '/:id')" do
     describe "happy path" do
       it "can get one vendor by its id" do
         id = create(:vendor).id
@@ -64,7 +64,7 @@ describe "Vendors API Endpoint" do
     end
   end
 
-  describe "create a vendor" do
+  describe "Create a Vendor (POST '/')" do
     describe "happy paths" do
       it "can create a new vendor" do
         vendor_params = {
@@ -150,7 +150,7 @@ describe "Vendors API Endpoint" do
     end
   end
 
-  describe "update a vendor" do
+  describe "Update a Vendor (PATCH '/:id')" do
     before do
       @id = create(:vendor, contact_name: "Ethan", credit_accepted: true).id
       @vendor = Vendor.find(@id)
