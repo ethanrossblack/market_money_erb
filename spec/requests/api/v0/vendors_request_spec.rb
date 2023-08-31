@@ -124,7 +124,7 @@ describe "Vendors API Endpoint ('/api/v0/vendors')" do
     end
 
     describe "sad paths" do
-      it "returns a 400 error if anything any attributes are missing" do
+      it "returns a 400 error if any attributes are missing" do
         vendor_params = {
           "name": "Buzzy Bees",
           "description": "local honey and wax products",
