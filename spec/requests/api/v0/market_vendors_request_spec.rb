@@ -45,6 +45,7 @@ describe "MarketVendor API Endpoint ('/api/v0/market_vendors')" do
         }
         @headers = {"CONTENT_TYPE": "application/json"}
       end
+
       it "returns a 422 :unprocessable_entity response if a MarketVendor already exists with the requested market_id and vendor_id" do
         MarketVendor.create!(market_id: @market.id, vendor_id: @vendor.id)
 
@@ -76,6 +77,51 @@ describe "MarketVendor API Endpoint ('/api/v0/market_vendors')" do
         expect(response.status).to eq(400)
 
         # I DON"T HAVE TIME TO FINISH THIS TEST BUT I WOULD LIKE TO FINISH IT
+      end
+    end
+  end
+
+  describe "Delete a MarketVendor (DELETE)" do
+    describe "happy path" do
+      it  "can delete a market vendor and return an empty 204 status response when given valid market and vendor ids" do
+        market_id = create(:market).id
+        vendor_id = create(:vendor).id
+        MarketVendor.create!(market_id: market_id, vendor_id: vendor_id)
+        mv_params = {
+          market_id: market_id,
+          vendor_id: vendor_id
+        }
+        headers = {"CONTENT_TYPE": "application/json"}
+
+        expect(MarketVendor.count).to eq(1)
+        
+        delete "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: mv_params)
+        
+        expect(MarketVendor.count).to eq(0)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(204)
+        expect(response.body).to be_empty
+      end
+    end
+
+    describe "sad path" do
+      it "returns a 404 not found error if trying to delete using invalid market or vendor ids" do
+        market_id = create(:market).id
+        vendor_id = create(:vendor).id
+        MarketVendor.create!(market_id: market_id, vendor_id: vendor_id)
+        bad_mv_params = {
+          vendor_id: vendor_id,
+          market_id: 123123123123123123123
+        }
+        headers = {"CONTENT_TYPE": "application/json"}
+
+        expect(MarketVendor.count).to eq(1)
+        
+        delete "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: bad_mv_params)
+        
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
       end
     end
   end
