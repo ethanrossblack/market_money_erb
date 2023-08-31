@@ -1,7 +1,7 @@
 require "rails_helper"
 
-describe "Vendors API Endpoint" do
-  describe "get one vendor'" do
+describe "Vendors API Endpoint ('/api/v0/vendors')" do
+  describe "Get One Vendor (GET '/:id')" do
     describe "happy path" do
       it "can get one vendor by its id" do
         id = create(:vendor).id
@@ -64,7 +64,7 @@ describe "Vendors API Endpoint" do
     end
   end
 
-  describe "create a vendor" do
+  describe "Create a Vendor (POST '/')" do
     describe "happy paths" do
       it "can create a new vendor" do
         vendor_params = {
@@ -150,7 +150,7 @@ describe "Vendors API Endpoint" do
     end
   end
 
-  describe "update a vendor" do
+  describe "Update a Vendor (PATCH '/:id')" do
     before do
       @id = create(:vendor, contact_name: "Ethan", credit_accepted: true).id
       @vendor = Vendor.find(@id)
@@ -209,6 +209,44 @@ describe "Vendors API Endpoint" do
         expect(json[:errors][0]).to be_a Hash
         expect(json[:errors][0]).to have_key(:detail)
         expect(json[:errors][0][:detail]).to eq("Validation failed: Contact name can't be blank")
+      end
+    end
+  end
+
+  describe "Delete a Vendor (DELETE '/:id')" do
+    describe "happy path" do
+      it  "can delete a vendor and return an empty 204 status response when given a valid id" do
+        id = create(:vendor).id
+
+        expect{ delete "/api/v0/vendors/#{id}" }.to change(Vendor, :count).by(-1)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(204)
+        expect(response.body).to be_empty
+      end
+
+      xit "deletes all associations with the vendor" do
+
+      end
+    end
+
+    describe "sad path" do
+      it "returns a 404 not found error if trying to delete an invalid Vendor id" do
+        # 123123123123 is an invalid Vendor ID
+        delete "/api/v0/vendors/123123123123"
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(json).to have_key(:errors)
+        expect(json[:errors]).to be_an Array
+        expect(json[:errors].count).to eq(1)
+        
+        expect(json[:errors][0]).to be_a Hash
+        expect(json[:errors][0]).to have_key(:detail)
+        expect(json[:errors][0][:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
       end
     end
   end

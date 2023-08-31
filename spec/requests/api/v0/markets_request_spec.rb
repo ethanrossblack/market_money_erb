@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-describe "Markets API Endpoint" do
-  describe "/markets" do
+describe "Markets API Endpoint ('/api/v0/markets')" do
+  describe "Get All Markets (GET '/markets')" do
     it "returns a list of all markets" do
       create_list(:market, 5)
 
@@ -57,7 +57,7 @@ describe "Markets API Endpoint" do
     end
   end
 
-  describe "'/markets/:id'" do
+  describe "Get One Market (GET '/markets/:id')" do
     describe "happy path" do
       it "can get one market by its id" do
         id = create(:market).id
@@ -131,7 +131,7 @@ describe "Markets API Endpoint" do
     end
   end
 
-  describe "/markets/:market_id/vendors" do
+  describe "Get All Vendors for a Market (GET '/markets/:market_id/vendors')" do
     describe "happy paths" do
       it "can return all vendors for a market" do
         market = create(:market)
