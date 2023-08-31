@@ -9,6 +9,7 @@ Rails.application.routes.draw do
         get "/vendors", to: "market_vendors#index"
       end
       resources :vendors
+      resources :market_vendors, only: [:create]
     end
   end
 end
