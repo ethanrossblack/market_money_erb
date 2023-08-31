@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe "Vendors API Endpoint" do
-  describe "'/vendors/:id'" do
+  describe "get one vendor'" do
     describe "happy path" do
       it "can get one vendor by its id" do
         id = create(:vendor).id
@@ -64,7 +64,7 @@ describe "Vendors API Endpoint" do
     end
   end
 
-  describe "POST '/vendors'" do
+  describe "create a vendor" do
     describe "happy paths" do
       it "can create a new vendor" do
         vendor_params = {
@@ -124,7 +124,7 @@ describe "Vendors API Endpoint" do
     end
 
     describe "sad paths" do
-      it "returns a 400 error if anything is missing" do
+      it "returns a 400 error if anything any attributes are missing" do
         vendor_params = {
           "name": "Buzzy Bees",
           "description": "local honey and wax products",
@@ -146,6 +146,69 @@ describe "Vendors API Endpoint" do
         expect(json[:errors][0]).to be_a Hash
         expect(json[:errors][0]).to have_key(:detail)
         expect(json[:errors][0][:detail]).to eq("Validation failed: Contact name can't be blank, Contact phone can't be blank")
+      end
+    end
+  end
+
+  describe "update a vendor" do
+    before do
+      @id = create(:vendor, contact_name: "Ethan", credit_accepted: true).id
+      @vendor = Vendor.find(@id)
+      @headers = {"CONTENT_TYPE" => "application/json"}
+      @vendor_params = { "contact_name": "Kimberly Couwer", "credit_accepted": false }
+    end
+
+    describe "happy path" do
+      it "can update a vendor" do
+        expect(@vendor.contact_name).to eq("Ethan")
+        expect(@vendor.credit_accepted).to eq(true)
+
+        patch "/api/v0/vendors/#{@id}", headers: @headers, params: JSON.generate({vendor: @vendor_params})
+        
+        updated_vendor = Vendor.find(@id)
+
+        expect(response).to be_successful
+        expect(updated_vendor.contact_name).to eq("Kimberly Couwer")
+        expect(updated_vendor.credit_accepted).to eq(false)
+      end
+    end
+
+    describe "sad paths" do
+      it "returns a 404 not found error if updating an invalid Vendor id" do
+        # 123123123123 is an invalid Vendor ID
+        patch "/api/v0/vendors/123123123123", headers: @headers, params: JSON.generate({vendor: @vendor_params})
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(json).to have_key(:errors)
+        expect(json[:errors]).to be_an Array
+        expect(json[:errors].count).to eq(1)
+        
+        expect(json[:errors][0]).to be_a Hash
+        expect(json[:errors][0]).to have_key(:detail)
+        expect(json[:errors][0][:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
+      end
+
+      it "returns a 400 bad request error if user tries to update a vendor with a 'nil' or empty attribute" do
+        bad_vendor_params = { "contact_name": "", "credit_accepted": false }
+
+        patch "/api/v0/vendors/#{@id}", headers: @headers, params: JSON.generate({vendor: bad_vendor_params})
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(json).to have_key(:errors)
+        expect(json[:errors]).to be_an Array
+        expect(json[:errors].count).to eq(1)
+        
+        expect(json[:errors][0]).to be_a Hash
+        expect(json[:errors][0]).to have_key(:detail)
+        expect(json[:errors][0][:detail]).to eq("Validation failed: Contact name can't be blank")
       end
     end
   end
