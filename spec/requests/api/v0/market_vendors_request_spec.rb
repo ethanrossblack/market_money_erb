@@ -78,6 +78,20 @@ describe "MarketVendor API Endpoint ('/api/v0/market_vendors')" do
 
         # I DON"T HAVE TIME TO FINISH THIS TEST BUT I WOULD LIKE TO FINISH IT
       end
+
+      it "returns a 404 status code if any attributes are missing" do
+        invalid_params = {
+          market_id: 123123123123,
+          vendor_id: @vendor.id
+        }
+
+        post "/api/v0/market_vendors", headers: @headers, params: JSON.generate(market_vendor: invalid_params)
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+
+        # I DON"T HAVE TIME TO FINISH THIS TEST BUT I WOULD LIKE TO FINISH IT
+      end
     end
   end
 
@@ -110,9 +124,10 @@ describe "MarketVendor API Endpoint ('/api/v0/market_vendors')" do
         market_id = create(:market).id
         vendor_id = create(:vendor).id
         MarketVendor.create!(market_id: market_id, vendor_id: vendor_id)
+
         bad_mv_params = {
-          vendor_id: vendor_id,
-          market_id: 123123123123123123123
+          vendor_id: 123123123123123123123,
+          market_id: market_id
         }
         headers = {"CONTENT_TYPE": "application/json"}
 
@@ -122,6 +137,12 @@ describe "MarketVendor API Endpoint ('/api/v0/market_vendors')" do
         
         expect(response).to_not be_successful
         expect(response.status).to eq(404)
+      end
+
+      it "returns a 400 error for incorrect stuff" do
+        market_id = create(:market).id
+        vendor_id = create(:vendor).id
+        MarketVendor.create!(market_id: market_id, vendor_id: vendor_id)
       end
     end
   end

@@ -10,10 +10,12 @@ class Api::V0::MarketVendorsController < ApplicationController
       market_vendor.save!
       render json: MarketVendorSerializer.new(market_vendor).serialize_json, status: 201
     rescue ActiveRecord::RecordInvalid => e
-      if e.message.include?("exist")
+      if e.message.include?("blank")
         render json: {"errors": [ {"detail": e.message}]}, status: 400
+      elsif e.message.include?("association")
+        render json: {"errors": [ {"detail": e.message}]}, status: 422
       else
-        render json: {"errors": [ {"detail": "Validation failed: Market vendor association between market with market_id=#{market_vendor.market_id} and vendor with vendor_id=#{market_vendor.vendor_id} already exists"}]}, status: 422
+        render json: { "errors": ["detail": e.message] }, status: :not_found
       end
     end
   end

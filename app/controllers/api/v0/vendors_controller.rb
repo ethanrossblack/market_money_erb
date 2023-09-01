@@ -24,9 +24,7 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def destroy
-    # calling .find in the delete method to raise an error if trying to delete an improper id
     Vendor.delete(Vendor.find(params[:id]))
-    render json: {}, status: :no_content
   end
 
   private
