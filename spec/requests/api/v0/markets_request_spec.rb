@@ -204,15 +204,27 @@ describe "Markets API Endpoint ('/api/v0/markets')" do
 
   describe "Search Markets by state, city, and/or name (GET 'markets/search')" do
     describe "happy path" do
-      xit "UNFINISHED searches markets by state, city, and/or name" do
+      it "searches markets by state" do
+        3.times do
+          create(:market, state: "Colorado")
+        end
+
+        create(:market, state: "New Mexico", city: "Albuquerque")
+
+        get "/api/v0/markets/search?state=Colorado"
+        json = JSON.parse(response.body, symbolize_names: true)
+      end
+    end
+
+    describe "sad path" do
+      it "returns an error if only searched by city" do
         3.times do
           create(:market, state: "Colorado")
         end
 
         create(:market, state: "New Mexico")
 
-        get "/api/v0/markets/search?state=Colorado"
-
+        get "/api/v0/markets/search?state=Colorado&name=county"
       end
     end
   end
