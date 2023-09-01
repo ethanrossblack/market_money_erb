@@ -201,4 +201,19 @@ describe "Markets API Endpoint ('/api/v0/markets')" do
       end
     end
   end
+
+  describe "Search Markets by state, city, and/or name (GET 'markets/search')" do
+    describe "happy path" do
+      xit "UNFINISHED searches markets by state, city, and/or name" do
+        3.times do
+          create(:market, state: "Colorado")
+        end
+
+        create(:market, state: "New Mexico")
+
+        get "/api/v0/markets/search?state=Colorado"
+
+      end
+    end
+  end
 end
