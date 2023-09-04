@@ -30,42 +30,35 @@ class Api::V0::MarketsController < ApplicationController
   end
 
   def search_params
-    require "pry"; binding.pry
     params.permit(:name, :state, :city)
   end
 
   def search_results(params)
     if params.has_key?(:state) && !params.has_key?(:name) && !params.has_key?(:city)
       Market.where(
-        "lower(state) LIKE lower(:state)",
-        { state: params[:state] + "%" }
+        "state ILIKE :state",
+        { state: "%#{params[:state]}%" }
       )
     elsif params.has_key?(:state) && !params.has_key?(:name) && params.has_key?(:city)
-      pry
       Market.where(
-        "lower(state) LIKE lower(:state) AND lower(city) LIKE lower(:city)",
-        { state: "#{params[:state]}%", city: "#{params[:city]}%" }
+        "state ILIKE :state AND city ILIKE :city",
+        { state: "%#{params[:state]}%", city: "%#{params[:city]}%" }
       )
     elsif params.has_key?(:state) && params.has_key?(:name) && !params.has_key?(:city)
-      require "pry"; binding.pry
       Market.where(
-        "lower(state) LIKE lower(:state) AND lower(name) LIKE lower(:name)", 
-        { state: "#{params[:state]}%", name: params[:name] + "%" }
+        "state ILIKE :state AND name ILIKE :name", 
+        { state: "%#{params[:state]}%", name: "%#{params[:name]}%" }
       )
     elsif !params.has_key?(:state) && params.has_key?(:name) && !params.has_key?(:city)
       Market.where(
-        "lower(name) LIKE lower(:name)",
-        { name: params[:name] + "%" }
+        "name ILIKE :name",
+        { name: "%#{params[:name]}%" }
       )
     elsif params.has_key?(:state) && params.has_key?(:name) && params.has_key?(:city)
       Market.where(
-        "lower(state) LIKE lower(:state) AND lower(name) LIKE lower(:name) AND lower(city) LIKE lower(:city)", 
-        { state: "#{params[:state]}%", name: "#{params[:name]}%", city: "#{params[:city]}%" }
+        "state ILIKE :state AND name ILIKE :name AND city ILIKE :city", 
+        { state: "%#{params[:state]}%", name: "%#{params[:name]}%", city: "%#{params[:city]}%" }
       )
     end
-  end
-
-  def sanitize_term(term)
-    "%" + term + "%"
   end
 end

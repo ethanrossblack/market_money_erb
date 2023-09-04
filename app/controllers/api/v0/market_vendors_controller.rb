@@ -15,13 +15,16 @@ class Api::V0::MarketVendorsController < ApplicationController
       elsif e.message.include?("association")
         render json: {"errors": [ {"detail": e.message}]}, status: 422
       else
-        render json: { "errors": ["detail": e.message] }, status: :not_found
+        render json: { "errors": ["detail": e.message] }, status: 404
       end
     end
   end
 
   def destroy
-    market_vendor = MarketVendor.find_by!(market_id: market_vendor_params[:market_id], vendor_id: market_vendor_params[:vendor_id])
+    market_vendor = MarketVendor.find_by!(
+      market_id: market_vendor_params[:market_id], 
+      vendor_id: market_vendor_params[:vendor_id]
+    )
     MarketVendor.delete(market_vendor)
   end
 
